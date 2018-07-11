@@ -1,0 +1,7 @@
+FROM python:2
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+ADD ./test.py .
+RUN pip install MySQL-python
+ENV MYSQL_DATABASE=test
+ENV MYSQL_ROOT_PASSWORD=Hashmap@1

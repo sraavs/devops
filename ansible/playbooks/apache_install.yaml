@@ -1,0 +1,36 @@
+---
+- name: This sets up an httpd webserver
+  hosts: web_portal
+  tasks:
+  - name: Install the httpd rpm, nginx, nmap
+    yum: name={{ item }}
+    with_items:
+      - httpd
+      - nginx
+      - nmap
+  - name: start the httpd service
+    service: name=httpd state=started
+  - name: Open port 80
+    firewalld: service=http permanent=true state=enabled
+  - name: start the firewalld service
+    service: name=firewalld state=restarted
+  - name: copy data files
+    copy: src=index.html dest=/var/www/html/
+    register: copy_status
+  - name: stop the service
+    service: name=httpd state=stopped
+  - name: copy template file
+    template: src=current.html.j2 dest=/var/www/html/current.html
+    notify:
+      - start apache
+  - name: Testing until
+    shell: service httpd status
+    register: result
+    until: result.stdout.find("active (running)") != -1
+    retries: 5
+    delay: 5
+  
+  handlers:
+  - name: start apache
+    service: name=httpd state=restarted
+    

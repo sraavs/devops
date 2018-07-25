@@ -23,14 +23,6 @@
     template: src=current.html.j2 dest=/var/www/html/current.html
     notify:
       - start apache
-  - name: Testing until
-    shell: service httpd status
-    register: result
-    until: result.stdout.find("active (running)") != -1
-    retries: 5
-    delay: 5
-  
   handlers:
   - name: start apache
     service: name=httpd state=restarted
-    
